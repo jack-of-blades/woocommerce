@@ -11,9 +11,8 @@ import type {
 const params: UseProductFactoryParams<Product, SearchParams> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   productsSearch: async (context: Context, params) => {
-    console.log('Mocked: useProduct.productsSearch');
-
-    return {};
+    const data = await context.$woocommerce.api.getProduct(params);
+    return data;
   }
 };
 

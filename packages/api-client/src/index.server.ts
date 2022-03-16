@@ -1,17 +1,26 @@
 import { apiClientFactory } from '@vue-storefront/core';
-import type { Setttings, Endpoints } from './types';
+import axios from 'axios';
 
-function onCreate(settings: Setttings) {
+import { getProduct } from './api/getProduct';
+
+function onCreate(settings) {
+  const client = axios.create({
+    baseURL: settings.api.url,
+    headers: {
+      'swiftcom-app-key': process.env.SWIFTCOM_APP_KEY
+    }
+  });
+
   return {
     config: settings,
-    client: {}
+    client: client
   };
 }
 
-const { createApiClient } = apiClientFactory<Setttings, Endpoints>({
+const { createApiClient } = apiClientFactory<any, any>({
   onCreate,
   api: {
-
+    getProduct
   }
 });
 
