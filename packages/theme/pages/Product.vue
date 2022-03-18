@@ -12,7 +12,7 @@
       <div class="product__info">
         <div class="product__header">
           <SfHeading
-            :title="productGetters.getName(product)"
+            :title="this.$route.query.title"
             :level="3"
             class="sf-heading--no-underline sf-heading--left"
           />
@@ -25,8 +25,8 @@
         </div>
         <div class="product__price-and-rating">
           <SfPrice
-            :regular="$n(productGetters.getPrice(product).regular, 'currency')"
-            :special="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+            :regular="$n(this.$route.query.price, 'currency')"
+            :special="$n(this.$route.query.regular_price, 'currency')"
           />
           <div>
             <div class="product__rating">
@@ -43,7 +43,7 @@
         </div>
         <div>
           <p class="product__description desktop-only">
-            {{ description }}
+            {{ this.$route.query.description }}
           </p>
           <SfButton class="sf-button--text desktop-only product__guide">
             {{ $t('Size guide') }}
@@ -90,7 +90,7 @@
           <SfTabs :open-tab="1" class="product__tabs">
             <SfTab title="Description">
               <div class="product__description">
-                  {{ $t('Product description') }}
+                  {{ $t(this.$route.query.description) }}
               </div>
               <SfProperty
                 v-for="(property, i) in properties"
@@ -185,7 +185,6 @@ import { useProduct, useCart, productGetters, useReview, reviewGetters } from '@
 import { onSSR } from '@vue-storefront/core';
 import LazyHydrate from 'vue-lazy-hydration';
 import cacheControl from './../helpers/cacheControl';
-import { addBasePath } from '@vue-storefront/core';
 
 export default {
   name: 'Product',
@@ -197,6 +196,7 @@ export default {
   setup() {
     const qty = ref(1);
     const route = useRoute();
+    console.log(route);
     const router = useRouter();
     const { products, search } = useProduct('products');
     const { products: relatedProducts, search: searchRelatedProducts, loading: relatedLoading } = useProduct('relatedProducts');
@@ -212,10 +212,10 @@ export default {
 
     // TODO: Breadcrumbs are temporary disabled because productGetters return undefined. We have a mocks in data
     // const breadcrumbs = computed(() => productGetters.getBreadcrumbs ? productGetters.getBreadcrumbs(product.value) : props.fallbackBreadcrumbs);
-    const productGallery = computed(() => productGetters.getGallery(product.value).map(img => ({
-      mobile: { url: addBasePath(img.small) },
-      desktop: { url: addBasePath(img.normal) },
-      big: { url: addBasePath(img.big) },
+    const productGallery = computed(() => route.value.query.images.map(img => ({
+      mobile: { url: img },
+      desktop: { url: img },
+      big: { url: img },
       alt: product.value._name || product.value.name
     })));
 
@@ -234,6 +234,8 @@ export default {
         }
       });
     };
+
+    console.log(route);
 
     return {
       updateFilter,

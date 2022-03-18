@@ -1,11 +1,13 @@
 import { Context } from '@vue-storefront/core';
 
-export async function getProduct(context: Context): Promise<any> {
+export async function getProduct(context: Context, params: { page: any; }): Promise<any> {
   const url = new URL('/wp-json/wp-sea-saas/v1/get-data', context.config.api.url);
+
+  console.log('fetching products page: ', params.page);
 
   const body = {
     type: 'products',
-    page: 0
+    page: params.page || 0
   };
 
   // Use axios to send a GET request
