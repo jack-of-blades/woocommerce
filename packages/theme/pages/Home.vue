@@ -2,7 +2,7 @@
   <div id="home">
 
     <LazyHydrate when-visible>
-      <div>
+      <div class="container">
         <div class="products-container">
           <div
           v-for="(product, i) in currentProducts"
@@ -103,6 +103,12 @@ export default {
   }
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .products-container {
   display: flex;
   flex-wrap: wrap;
@@ -121,6 +127,7 @@ export default {
   img {
     width: 100%;
     max-height: 200px;
+    object-fit: cover;
   }
 }
 
