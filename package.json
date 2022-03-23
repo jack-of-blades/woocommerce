@@ -3,7 +3,7 @@
   "private": true,
   "license": "MIT",
   "engines": {
-    "node": ">=12.x"
+    "node": "16.14.0"
   },
   "scripts": {
     "build": "yarn build:api-client && yarn build:composables && yarn build:theme",
