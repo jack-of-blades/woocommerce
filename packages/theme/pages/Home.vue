@@ -1,30 +1,30 @@
 <template>
   <div id="home">
-
-    <LazyHydrate when-visible>
-      <div class="container">
-        <div class="products-container">
-          <div
-          v-for="(product, i) in currentProducts"
-          :key="i" class="product-card"
-          @click="$router.push({path: `/product/${product.slug}`, query: {
-            title: product.title,
-            price: product.price,
-            regular_price: product.regular_price,
-            description: product.description,
-            images: [product.featured_image.sourceUrl, ...product.images.map((img) => img.sourceUrl)]
-          }})"
-          >
-            <img :src="product.featured_image.sourceUrl"/>
-            <h3 class="product-title">{{product.title}}</h3>
+    <client-only>
+      <LazyHydrate when-visible>
+        <div class="container">
+          <div class="products-container">
+            <div
+            v-for="(product, i) in currentProducts"
+            :key="i" class="product-card"
+            @click="$router.push({path: `/product/${product.slug}`, query: {
+              title: product.title,
+              price: product.price,
+              regular_price: product.regular_price,
+              description: product.description,
+              images: [product.featured_image.sourceUrl, ...product.images.map((img) => img.sourceUrl)]
+            }})"
+            >
+              <img :src="product.featured_image.sourceUrl"/>
+              <h3 class="product-title">{{product.title}}</h3>
+            </div>
           </div>
+          <h1 v-if="loading">Loading...</h1>
+          <h1 v-if="noMoreProducts">No more products</h1>
+          <button v-else @click="update">Load more</button>
         </div>
-        <h1 v-if="loading">Loading...</h1>
-        <h1 v-if="noMoreProducts">No more products</h1>
-        <button v-else @click="update">Load more</button>
-      </div>
-    </LazyHydrate>
-
+      </LazyHydrate>
+    </client-only>
   </div>
 </template>
 <script>
