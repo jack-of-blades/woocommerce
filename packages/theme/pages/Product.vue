@@ -1,160 +1,44 @@
 <template>
   <div id="product">
-    <SfBreadcrumbs
-      class="breadcrumbs desktop-only"
-      :breadcrumbs="breadcrumbs"
-    />
     <div class="product">
-      <LazyHydrate when-idle>
-        <SfGallery :images="productGallery" class="product__gallery" />
-      </LazyHydrate>
+      <client-only>
+        <LazyHydrate when-idle>
+          <SfGallery :images="productGallery" class="product__gallery" />
+        </LazyHydrate>
 
-      <div class="product__info">
-        <div class="product__header">
-          <SfHeading
-            :title="this.$route.query.title"
-            :level="3"
-            class="sf-heading--no-underline sf-heading--left"
-          />
-          <SfIcon
-            icon="drag"
-            size="xxl"
-            color="var(--c-text-disabled)"
-            class="product__drag-icon smartphone-only"
-          />
-        </div>
-        <div class="product__price-and-rating">
-          <SfPrice
-            :regular="$n(this.$route.query.price, 'currency')"
-            :special="$n(this.$route.query.regular_price, 'currency')"
-          />
-          <div>
-            <div class="product__rating">
-              <SfRating
-                :score="averageRating"
-                :max="5"
-              />
-              <a v-if="!!totalReviews" href="#" class="product__count">
-                ({{ totalReviews }})
-              </a>
-            </div>
-            <SfButton class="sf-button--text">{{ $t('Read all reviews') }}</SfButton>
-          </div>
-        </div>
-        <div>
-          <p class="product__description desktop-only">
-            {{ this.$route.query.description }}
-          </p>
-          <SfButton class="sf-button--text desktop-only product__guide">
-            {{ $t('Size guide') }}
-          </SfButton>
-          <SfSelect
-            v-e2e="'size-select'"
-            v-if="options.size"
-            :value="configuration.size"
-            @input="size => updateFilter({ size })"
-            label="Size"
-            class="sf-select--underlined product__select-size"
-            :required="true"
-          >
-            <SfSelectOption
-              v-for="size in options.size"
-              :key="size.value"
-              :value="size.value"
-            >
-              {{size.label}}
-            </SfSelectOption>
-          </SfSelect>
-          <div v-if="options.color && options.color.length > 1" class="product__colors desktop-only">
-            <p class="product__color-label">{{ $t('Color') }}:</p>
-            <SfColor
-              v-for="(color, i) in options.color"
-              :key="i"
-              :color="color.value"
-              class="product__color"
-              @click="updateFilter({ color: color.value })"
+        <div class="product__info">
+          <div class="product__header">
+            <SfHeading
+              :title="product.title"
+              :level="3"
+              class="sf-heading--no-underline sf-heading--left"
+            />
+            <SfIcon
+              icon="drag"
+              size="xxl"
+              color="var(--c-text-disabled)"
+              class="product__drag-icon smartphone-only"
             />
           </div>
-          <SfAddToCart
-            v-e2e="'product_add-to-cart'"
-            :stock="stock"
-            v-model="qty"
-            :disabled="loading"
-            :canAddToCart="stock > 0"
-            class="product__add-to-cart"
-            @click="addItem({ product, quantity: parseInt(qty) })"
-          />
-        </div>
-
-        <LazyHydrate when-idle>
-          <SfTabs :open-tab="1" class="product__tabs">
-            <SfTab title="Description">
-              <div class="product__description">
-                  {{ $t(this.$route.query.description) }}
-              </div>
-              <SfProperty
-                v-for="(property, i) in properties"
-                :key="i"
-                :name="property.name"
-                :value="property.value"
-                class="product__property"
-              >
-                <template v-if="property.name === 'Category'" #value>
-                  <SfButton class="product__property__button sf-button--text">
-                    {{ property.value }}
-                  </SfButton>
-                </template>
-              </SfProperty>
-            </SfTab>
-            <SfTab title="Read reviews">
-              <SfReview
-                v-for="review in reviews"
-                :key="reviewGetters.getReviewId(review)"
-                :author="reviewGetters.getReviewAuthor(review)"
-                :date="reviewGetters.getReviewDate(review)"
-                :message="reviewGetters.getReviewMessage(review)"
-                :max-rating="5"
-                :rating="reviewGetters.getReviewRating(review)"
-                :char-limit="250"
-                read-more-text="Read more"
-                hide-full-text="Read less"
-                class="product__review"
-              />
-            </SfTab>
-            <SfTab
-              title="Additional Information"
-              class="product__additional-info"
-            >
-            <div class="product__additional-info">
-              <p class="product__additional-info__title">{{ $t('Brand') }}</p>
-              <p>{{ brand }}</p>
-              <p class="product__additional-info__title">{{ $t('Instruction1') }}</p>
-              <p class="product__additional-info__paragraph">
-                {{ $t('Instruction2') }}
-              </p>
-              <p class="product__additional-info__paragraph">
-                {{ $t('Instruction3') }}
-              </p>
-              <p>{{ careInstructions }}</p>
-            </div>
-            </SfTab>
-          </SfTabs>
-        </LazyHydrate>
-      </div>
+          <div class="product__price-and-rating">
+            <SfPrice :regular="$n(product.price, 'currency')" />
+          </div>
+          <div>
+            <p class="product__description desktop-only">
+              {{ product.description }}
+            </p>
+            <SfAddToCart
+              v-e2e="'product_add-to-cart'"
+              :stock="stock"
+              v-model="qty"
+              :disabled="loading"
+              :canAddToCart="stock > 0"
+              class="product__add-to-cart"
+              @click="addItem({ product, quantity: parseInt(qty) })"
+            />
+          </div></div
+      ></client-only>
     </div>
-
-    <LazyHydrate when-visible>
-      <RelatedProducts
-        :products="relatedProducts"
-        :loading="relatedLoading"
-        title="Match it with"
-      />
-    </LazyHydrate>
-
-    <LazyHydrate when-visible>
-      <InstagramFeed />
-    </LazyHydrate>
-
   </div>
 </template>
 <script>
@@ -175,13 +59,17 @@ import {
   SfReview,
   SfBreadcrumbs,
   SfButton,
-  SfColor
+  SfColor,
 } from '@storefront-ui/vue';
 
 import InstagramFeed from '~/components/InstagramFeed.vue';
 import RelatedProducts from '~/components/RelatedProducts.vue';
-import { ref, computed, useRoute, useRouter } from '@nuxtjs/composition-api';
-import { useProduct, useCart, productGetters, useReview, reviewGetters } from '@vue-storefront/woocommerce';
+import { ref, computed, useRoute } from '@nuxtjs/composition-api';
+import {
+  useProduct,
+  useCart,
+  productGetters,
+} from '@vue-storefront/woocommerce';
 import { onSSR } from '@vue-storefront/core';
 import LazyHydrate from 'vue-lazy-hydration';
 import cacheControl from './../helpers/cacheControl';
@@ -191,68 +79,36 @@ export default {
   transition: 'fade',
   middleware: cacheControl({
     'max-age': 60,
-    'stale-when-revalidate': 5
+    'stale-when-revalidate': 5,
   }),
   setup() {
     const qty = ref(1);
     const route = useRoute();
-    console.log(route);
-    const router = useRouter();
     const { products, search } = useProduct('products');
-    const { products: relatedProducts, search: searchRelatedProducts, loading: relatedLoading } = useProduct('relatedProducts');
+
     const { addItem, loading } = useCart();
-    const { reviews: productReviews, search: searchReviews } = useReview('productReviews');
+    const product = computed(() => products.value);
 
-    const id = computed(() => route.value.params.id);
-    const product = computed(() => productGetters.getFiltered(products.value, { master: true, attributes: route.value.query })[0]);
-    const options = computed(() => productGetters.getAttributes(products.value, ['color', 'size']));
-    const configuration = computed(() => productGetters.getAttributes(product.value, ['color', 'size']));
-    const categories = computed(() => productGetters.getCategoryIds(product.value));
-    const reviews = computed(() => reviewGetters.getItems(productReviews.value));
-
-    // TODO: Breadcrumbs are temporary disabled because productGetters return undefined. We have a mocks in data
-    // const breadcrumbs = computed(() => productGetters.getBreadcrumbs ? productGetters.getBreadcrumbs(product.value) : props.fallbackBreadcrumbs);
-    const productGallery = computed(() => route.value.query.images.map(img => ({
-      mobile: { url: img },
-      desktop: { url: img },
-      big: { url: img },
-      alt: product.value._name || product.value.name
-    })));
+    const productGallery = computed(() =>
+      [products.value.featured_image, ...products.value.images].map((img) => ({
+        mobile: { url: img },
+        desktop: { url: img },
+        big: { url: img },
+        alt: 'product',
+      }))
+    );
 
     onSSR(async () => {
-      await search({ id: id.value });
-      await searchRelatedProducts({ catId: [categories.value[0]], limit: 8 });
-      await searchReviews({ productId: id.value });
+      await search({ id: route.value.params.id });
     });
 
-    const updateFilter = (filter) => {
-      router.push({
-        path: route.value.path,
-        query: {
-          ...configuration.value,
-          ...filter
-        }
-      });
-    };
-
-    console.log(route);
-
     return {
-      updateFilter,
-      configuration,
       product,
-      reviews,
-      reviewGetters,
-      averageRating: computed(() => productGetters.getAverageRating(product.value)),
-      totalReviews: computed(() => productGetters.getTotalReviews(product.value)),
-      relatedProducts: computed(() => productGetters.getFiltered(relatedProducts.value, { master: true })),
-      relatedLoading,
-      options,
       qty,
       addItem,
       loading,
       productGetters,
-      productGallery
+      productGallery,
     };
   },
   components: {
@@ -275,33 +131,13 @@ export default {
     SfButton,
     InstagramFeed,
     RelatedProducts,
-    LazyHydrate
+    LazyHydrate,
   },
   data() {
     return {
       stock: 5,
-      breadcrumbs: [
-        {
-          text: 'Home',
-          route: {
-            link: '#'
-          }
-        },
-        {
-          text: 'Category',
-          route: {
-            link: '#'
-          }
-        },
-        {
-          text: 'Pants',
-          route: {
-            link: '#'
-          }
-        }
-      ]
     };
-  }
+  },
 };
 </script>
 

@@ -1,12 +1,11 @@
 <template>
   <div class="sf-header__navigation desktop" v-if="!isMobile">
     <SfHeaderNavigationItem
-      v-for="(category, index) in categories"
       :key="index"
       class="nav-item"
-      v-e2e="`app-header-url_${category}`"
-      :label="category"
-      :link="localePath(`/c/${category}`)"
+      v-e2e="`app-header-url_shop`"
+      label="shop"
+      :link="localePath(`/shop`)"
     />
   </div>
   <SfModal v-else :visible="isMobileMenuOpen">
