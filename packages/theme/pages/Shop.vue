@@ -11,7 +11,9 @@
             >
               <a :href="`/p/${product.database_id}/${product.slug}`">
                 <img :src="product.featured_image.sourceUrl" />
-                <h3 class="product-title">{{ product.title }}</h3>
+                <h3 class="product-title">
+                  {{ productGetters.getName(product) }}
+                </h3>
               </a>
             </div>
           </div>
@@ -30,22 +32,25 @@ import NewsletterModal from '~/components/NewsletterModal.vue';
 import LazyHydrate from 'vue-lazy-hydration';
 import cacheControl from './../helpers/cacheControl';
 import { addBasePath } from '@vue-storefront/core';
-import { useProduct } from '@vue-storefront/woocommerce';
-import { ref, onMounted } from '@nuxtjs/composition-api';
+import { useProduct, productGetters } from '@vue-storefront/woocommerce';
+import { ref, onMounted, computed } from '@nuxtjs/composition-api';
 
 export default {
   name: 'Home',
   middleware: cacheControl({
     'max-age': 60,
-    'stale-when-revalidate': 5,
+    'stale-when-revalidate': 5
   }),
   components: {
     InstagramFeed,
     NewsletterModal,
-    LazyHydrate,
+    LazyHydrate
   },
   setup: () => {
-    const { products, search, loading } = useProduct();
+    const { products: productsRaw, search, loading } = useProduct();
+    const products = computed(() =>
+      productGetters.getFiltered(productsRaw.value)
+    );
 
     const currentProducts = ref([]);
     const page = ref(0);
@@ -76,8 +81,9 @@ export default {
       update,
       noMoreProducts,
       loading,
+      productGetters
     };
-  },
+  }
 };
 </script>
 

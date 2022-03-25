@@ -3,13 +3,16 @@
     <div class="product">
       <client-only>
         <LazyHydrate when-idle>
-          <SfGallery :images="productGallery" class="product__gallery" />
+          <SfGallery
+            :images="productGetters.getFormattedGallery(product)"
+            class="product__gallery"
+          />
         </LazyHydrate>
 
         <div class="product__info">
           <div class="product__header">
             <SfHeading
-              :title="product.title"
+              :title="productGetters.getName(product)"
               :level="3"
               class="sf-heading--no-underline sf-heading--left"
             />
@@ -21,17 +24,26 @@
             />
           </div>
           <div class="product__price-and-rating">
-            <SfPrice :regular="$n(product.price, 'currency')" />
+            <SfPrice
+              :regular="
+                $n(productGetters.getPrice(product).regular, 'currency')
+              "
+              :special="
+                productGetters.getPrice(product).special &&
+                $n(productGetters.getPrice(product).special, 'currency')
+              "
+            />
           </div>
           <div>
-            <p class="product__description desktop-only">
-              {{ product.description }}
-            </p>
+            <p
+              class="product__description desktop-only"
+              v-html="productGetters.getDescription(product)"
+            ></p>
             <SfAddToCart
               v-e2e="'product_add-to-cart'"
               :stock="stock"
               v-model="qty"
-              :disabled="loading"
+              :disabled="cartLoading"
               :canAddToCart="stock > 0"
               class="product__add-to-cart"
               @click="addItem({ product, quantity: parseInt(qty) })"
@@ -43,32 +55,19 @@
 </template>
 <script>
 import {
-  SfProperty,
   SfHeading,
   SfPrice,
-  SfRating,
   SfSelect,
   SfAddToCart,
-  SfTabs,
   SfGallery,
-  SfIcon,
-  SfImage,
-  SfBanner,
-  SfAlert,
-  SfSticky,
-  SfReview,
-  SfBreadcrumbs,
-  SfButton,
-  SfColor,
+  SfIcon
 } from '@storefront-ui/vue';
 
-import InstagramFeed from '~/components/InstagramFeed.vue';
-import RelatedProducts from '~/components/RelatedProducts.vue';
 import { ref, computed, useRoute } from '@nuxtjs/composition-api';
 import {
   useProduct,
   useCart,
-  productGetters,
+  productGetters
 } from '@vue-storefront/woocommerce';
 import { onSSR } from '@vue-storefront/core';
 import LazyHydrate from 'vue-lazy-hydration';
@@ -79,23 +78,16 @@ export default {
   transition: 'fade',
   middleware: cacheControl({
     'max-age': 60,
-    'stale-when-revalidate': 5,
+    'stale-when-revalidate': 5
   }),
   setup() {
     const qty = ref(1);
     const route = useRoute();
-    const { products, search } = useProduct('products');
+    const { products, search, loading } = useProduct();
 
-    const { addItem, loading } = useCart();
-    const product = computed(() => products.value);
-
-    const productGallery = computed(() =>
-      [products.value.featured_image, ...products.value.images].map((img) => ({
-        mobile: { url: img },
-        desktop: { url: img },
-        big: { url: img },
-        alt: 'product',
-      }))
+    const { addItem, loading: cartLoading } = useCart();
+    const product = computed(() =>
+      productGetters.getFilteredSingle(products.value)
     );
 
     onSSR(async () => {
@@ -107,37 +99,24 @@ export default {
       qty,
       addItem,
       loading,
-      productGetters,
-      productGallery,
+      cartLoading,
+      productGetters
     };
   },
   components: {
-    SfAlert,
-    SfColor,
-    SfProperty,
     SfHeading,
     SfPrice,
-    SfRating,
     SfSelect,
     SfAddToCart,
-    SfTabs,
     SfGallery,
     SfIcon,
-    SfImage,
-    SfBanner,
-    SfSticky,
-    SfReview,
-    SfBreadcrumbs,
-    SfButton,
-    InstagramFeed,
-    RelatedProducts,
-    LazyHydrate,
+    LazyHydrate
   },
   data() {
     return {
-      stock: 5,
+      stock: 5
     };
-  },
+  }
 };
 </script>
 

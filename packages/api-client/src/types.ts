@@ -24,7 +24,16 @@ export type OrderItem = TODO;
 
 export type PasswordResetResult = TODO;
 
-export type Product = TODO;
+export type Product = {
+    title: string,
+    slug: string,
+    database_id: number,
+    description: string,
+    featured_image: string,
+    images: Array<string>,
+    price: number,
+    regular_price: number,
+};
 
 export type ProductFilter = TODO;
 
@@ -57,3 +66,10 @@ export type Store = TODO;
 export type Wishlist = TODO;
 
 export type WishlistItem = TODO;
+
+export type FormattedMediaGalleryItem = {
+    mobile: { url: string };
+    desktop: { url: string };
+    big: { url: string };
+    alt: string;
+};
