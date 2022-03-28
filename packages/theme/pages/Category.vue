@@ -10,18 +10,20 @@
           <SfHeading
             :level="3"
             :title="$t('Categories')"
-            class="navbar__title" />
+            class="navbar__title"
+          />
         </LazyHydrate>
       </div>
-      <CategoryPageHeader :pagination="pagination"/>
+      <CategoryPageHeader :pagination="pagination" />
     </div>
 
     <div class="main section">
       <div class="sidebar desktop-only">
         <LazyHydrate when-idle>
           <SfLoader
-          :class="{ 'loading--categories': loading }"
-          :loading="loading">
+            :class="{ 'loading--categories': loading }"
+            :loading="loading"
+          >
             <SfAccordion
               v-e2e="'categories-accordion'"
               :open="activeCategory"
@@ -35,14 +37,13 @@
                 <template>
                   <SfList class="list">
                     <SfListItem class="list__item">
-                      <SfMenuItem
-                        :count="cat.count || ''"
-                        :label="cat.label"
-                      >
+                      <SfMenuItem :count="cat.count || ''" :label="cat.label">
                         <template #label>
                           <nuxt-link
                             :to="localePath(th.getCatLink(cat))"
-                            :class="cat.isCurrent ? 'sidebar--cat-selected' : ''"
+                            :class="
+                              cat.isCurrent ? 'sidebar--cat-selected' : ''
+                            "
                           >
                             All
                           </nuxt-link>
@@ -61,7 +62,9 @@
                         <template #label="{ label }">
                           <nuxt-link
                             :to="localePath(th.getCatLink(subCat))"
-                            :class="subCat.isCurrent ? 'sidebar--cat-selected' : ''"
+                            :class="
+                              subCat.isCurrent ? 'sidebar--cat-selected' : ''
+                            "
                           >
                             {{ label }}
                           </nuxt-link>
@@ -91,16 +94,31 @@
               :style="{ '--index': i }"
               :title="productGetters.getName(product)"
               :image="addBasePath(productGetters.getCoverImage(product))"
-              :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
-              :special-price="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+              :regular-price="
+                $n(productGetters.getPrice(product).regular, 'currency')
+              "
+              :special-price="
+                productGetters.getPrice(product).special &&
+                $n(productGetters.getPrice(product).special, 'currency')
+              "
               :max-rating="5"
               :score-rating="productGetters.getAverageRating(product)"
               :show-add-to-cart-button="true"
               :is-in-wishlist="isInWishlist({ product })"
               :is-added-to-cart="isInCart({ product })"
-              :link="localePath(`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`)"
+              :link="
+                localePath(
+                  `/p/${productGetters.getId(product)}/${productGetters.getSlug(
+                    product
+                  )}`
+                )
+              "
               class="products__product-card"
-              @click:wishlist="!isInWishlist({ product }) ? addItemToWishlist({ product }) : removeProductFromWishlist(product)"
+              @click:wishlist="
+                !isInWishlist({ product })
+                  ? addItemToWishlist({ product })
+                  : removeProductFromWishlist(product)
+              "
               @click:add-to-cart="addToCart({ product, quantity: 1 })"
             />
           </transition-group>
@@ -120,30 +138,50 @@
               :title="productGetters.getName(product)"
               :description="productGetters.getDescription(product)"
               :image="addBasePath(productGetters.getCoverImage(product))"
-              :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
-              :special-price="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+              :regular-price="
+                $n(productGetters.getPrice(product).regular, 'currency')
+              "
+              :special-price="
+                productGetters.getPrice(product).special &&
+                $n(productGetters.getPrice(product).special, 'currency')
+              "
               :max-rating="5"
               :score-rating="3"
               :qty="1"
               :is-in-wishlist="isInWishlist({ product })"
-              :link="localePath(`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`)"
+              :link="
+                localePath(
+                  `/p/${productGetters.getId(product)}/${productGetters.getSlug(
+                    product
+                  )}`
+                )
+              "
               @input="productsQuantity[product._id] = $event"
-              @click:wishlist="!isInWishlist({ product }) ? addItemToWishlist({ product }) : removeProductFromWishlist(product)"
-              @click:add-to-cart="addToCart({ product, quantity: Number(productsQuantity[product._id]) })"
+              @click:wishlist="
+                !isInWishlist({ product })
+                  ? addItemToWishlist({ product })
+                  : removeProductFromWishlist(product)
+              "
+              @click:add-to-cart="
+                addToCart({
+                  product,
+                  quantity: Number(productsQuantity[product._id]),
+                })
+              "
             >
               <template #configuration>
                 <SfProperty
                   class="desktop-only"
                   name="Size"
                   value="XS"
-                  style="margin: 0 0 1rem 0;"
+                  style="margin: 0 0 1rem 0"
                 />
                 <SfProperty class="desktop-only" name="Color" value="white" />
               </template>
               <template #actions>
                 <SfButton
                   class="sf-button--text desktop-only"
-                  style="margin: 0 0 1rem auto; display: block;"
+                  style="margin: 0 0 1rem auto; display: block"
                   @click="() => {}"
                 >
                   {{ $t('Save for later') }}
@@ -167,10 +205,16 @@
             v-show="pagination.totalPages > 1"
             class="products__show-on-page"
           >
-            <span class="products__show-on-page__label">{{ $t('Show on page') }}</span>
+            <span class="products__show-on-page__label">{{
+              $t('Show on page')
+            }}</span>
             <LazyHydrate on-interaction>
               <SfSelect
-                :value="pagination && pagination.itemsPerPage ? pagination.itemsPerPage.toString() : ''"
+                :value="
+                  pagination && pagination.itemsPerPage
+                    ? pagination.itemsPerPage.toString()
+                    : ''
+                "
                 class="products__items-per-page"
                 @input="th.changeItemsPerPage"
               >
@@ -208,10 +252,17 @@ import {
   SfBreadcrumbs,
   SfLoader,
   SfColor,
-  SfProperty
+  SfProperty,
 } from '@storefront-ui/vue';
 import { computed, ref } from '@nuxtjs/composition-api';
-import { useCart, useWishlist, productGetters, useFacet, facetGetters, wishlistGetters } from '@vue-storefront/woocommerce';
+import {
+  useCart,
+  useWishlist,
+  productGetters,
+  useFacet,
+  facetGetters,
+  wishlistGetters,
+} from '@vue-storefront/woocommerce';
 import { useUiHelpers, useUiState } from '~/composables';
 import { onSSR } from '@vue-storefront/core';
 import LazyHydrate from 'vue-lazy-hydration';
@@ -224,19 +275,29 @@ export default {
   transition: 'fade',
   middleware: cacheControl({
     'max-age': 60,
-    'stale-when-revalidate': 5
+    'stale-when-revalidate': 5,
   }),
   setup(props, context) {
     const th = useUiHelpers();
     const uiState = useUiState();
     const { addItem: addItemToCart, isInCart } = useCart();
     const { result, search, loading, error } = useFacet();
-    const { addItem: addItemToWishlist, isInWishlist, removeItem: removeItemFromWishlist, wishlist } = useWishlist();
+    const {
+      addItem: addItemToWishlist,
+      isInWishlist,
+      removeItem: removeItemFromWishlist,
+      wishlist,
+    } = useWishlist();
 
     const productsQuantity = ref({});
     const products = computed(() => facetGetters.getProducts(result.value));
-    const categoryTree = computed(() => facetGetters.getCategoryTree(result.value));
-    const breadcrumbs = computed(() => facetGetters.getBreadcrumbs(result.value));
+    const categoryTree = computed(() =>
+      facetGetters.getCategoryTree(result.value)
+    );
+    console.log(categoryTree);
+    const breadcrumbs = computed(() =>
+      facetGetters.getBreadcrumbs(result.value)
+    );
     const pagination = computed(() => facetGetters.getPagination(result.value));
     const activeCategory = computed(() => {
       const items = categoryTree.value.items;
@@ -245,14 +306,21 @@ export default {
         return '';
       }
 
-      const category = items.find(({ isCurrent, items }) => isCurrent || items.find(({ isCurrent }) => isCurrent));
+      const category = items.find(
+        ({ isCurrent, items }) =>
+          isCurrent || items.find(({ isCurrent }) => isCurrent)
+      );
 
       return category?.label || items[0].label;
     });
 
     const removeProductFromWishlist = (productItem) => {
-      const productsInWhishlist = computed(() => wishlistGetters.getItems(wishlist.value));
-      const product = productsInWhishlist.value.find(wishlistProduct => wishlistProduct.variant.sku === productItem.sku);
+      const productsInWhishlist = computed(() =>
+        wishlistGetters.getItems(wishlist.value)
+      );
+      const product = productsInWhishlist.value.find(
+        (wishlistProduct) => wishlistProduct.variant.sku === productItem.sku
+      );
       removeItemFromWishlist({ product });
     };
 
@@ -260,7 +328,7 @@ export default {
       const { id, sku } = product;
       addItemToCart({
         product: { id, sku },
-        quantity
+        quantity,
       });
     };
 
@@ -285,7 +353,7 @@ export default {
       addToCart,
       isInCart,
       productsQuantity,
-      addBasePath
+      addBasePath,
     };
   },
   components: {
@@ -306,8 +374,8 @@ export default {
     SfColor,
     SfHeading,
     SfProperty,
-    LazyHydrate
-  }
+    LazyHydrate,
+  },
 };
 </script>
 

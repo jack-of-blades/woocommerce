@@ -13,7 +13,7 @@ export async function getProduct(context: Context, params): Promise<any> {
     return data;
   }
   else {
-    console.log('fetching products page: ', params.page || 'default 0');
+    console.log('Fetching products page: ', params.page || 'default 0');
     const url = new URL('/wp-json/wp-sea-saas/v1/get-data', context.config.api.url);
 
     const body = {
